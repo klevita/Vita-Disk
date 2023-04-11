@@ -18,7 +18,7 @@
                 <v-card-actions>
                     <v-btn color="success" variant="outlined" @click="form.validate(); register()">Утвердить</v-btn>
                     <v-spacer />
-                    <v-btn @click="$emit('switch')" text>Войти</v-btn>
+                    <v-btn @click="$emit('switch')" text>Вход</v-btn>
                 </v-card-actions>
             </v-form>
         </v-card>

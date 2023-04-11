@@ -8,6 +8,7 @@
 <script lang="ts" >
 import LoginComponent from "@/components/LoginComponent.vue";
 import RegistrationComponent from "@/components/RegistrationComponent.vue";
+import AuthService from "@/services/AuthService";
 import Vue from "vue"
 
 export default Vue.extend({
@@ -16,6 +17,7 @@ export default Vue.extend({
         mode:<'register' | 'login'>'register'
     }),
     mounted(){
+        AuthService.Logout()
         this.$store.commit('dropUser')
     },
     methods: {},
