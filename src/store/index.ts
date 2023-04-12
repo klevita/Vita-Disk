@@ -15,7 +15,10 @@ class State {
     user: User = {
         email: '',
         token: ''
-    };
+    }
+    weight = 0
+    fileNameSearch = ''
+    fileExtensionSearch = ''
 }
 
 const getters = <GetterTree<State, any>>{
@@ -24,6 +27,24 @@ const getters = <GetterTree<State, any>>{
 const mutations = <MutationTree<State>>{
     setUser(state, payload: User) {
         state.user = payload;
+    },
+    setWeight(state, payload: number) {
+        state.weight = payload;
+    },
+    setFileExtensionSearch(state, payload: string) {
+        if (payload) {
+            state.fileExtensionSearch = payload
+        } else {
+            state.fileExtensionSearch = ''
+        }
+    },
+    setFileNameSearch(state, payload: string | null) {
+        if (payload) {
+            state.fileNameSearch = payload
+        } else {
+            state.fileNameSearch = ''
+        }
+
     },
     dropUser(state) {
         state.user = {

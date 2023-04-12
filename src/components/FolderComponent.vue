@@ -6,7 +6,7 @@
                     <span>
                         {{ folderData.name }}
                     </span>
-                    <div style="display: flex;justify-content: end;margin-right: 44px;">
+                    <div style="display: flex;justify-content: end;margin-right: 80px;">
                         <v-chip>
                             {{ (folderData.size / 1000000).toFixed(3) + ' мб' }}
                         </v-chip>
@@ -14,10 +14,10 @@
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <v-card class="folder-item-wrapper">
-                        <v-file-input style="margin-right: 20px;" :error="fileError" :loading="fileLoading"
+                        <v-file-input :error="fileError" :loading="fileLoading"
                             :messages="fileErrors" v-model="file" show-size label="Загрузить файл"></v-file-input>
                     </v-card>
-                    <FileComponent v-for="f in rawFilesData" :data="f" :key="f.id" />
+                    <FileComponent v-for="f in files" :data="f" :key="f.id" />
                 </v-expansion-panel-content>
             </v-expansion-panel>
         </v-expansion-panels>
@@ -63,10 +63,26 @@ export default Vue.extend({
             if (this.validateFile(f) && f) {
                 this.fileLoading = true;
                 const resp = await FileService.UploadFile(f,this.folderData.id);
-                console.log(resp);
                 this.fileLoading = false;
                 this.rawFilesData = (await FileService.GetFiles(this.folderData.id)).data;
             }
+        }
+    },
+    computed: {
+        files(): _File[] {
+            return this.rawFilesData.filter((f) => {
+                if(this.$store.state.fileExtensionSearch.length){
+                    if(f.full_name.slice(f.full_name.lastIndexOf('.')+1) !== this.$store.state.fileExtensionSearch){
+                        return false
+                    }
+                }
+                if(this.$store.state.fileNameSearch.length){
+                    if(!f.name.includes(this.$store.state.fileNameSearch)){
+                        return false
+                    }
+                }
+                return true
+            })
         }
     },
     props: {

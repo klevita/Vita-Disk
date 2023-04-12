@@ -1,8 +1,12 @@
 <template>
     <v-card class="file-card">
-        <div style="display: flex;align-items: center;">
-            {{ data.full_name }}
+        <div style="display: flex;align-items: center;width:calc(100% - 260px);">
+            <v-text-field @change="updateFile" v-model="data.name"></v-text-field>
+            <div style="padding-left: 5px;padding-bottom: 2px;">
+                {{ data.full_name.slice(data.full_name.lastIndexOf('.')) }}
+            </div>
         </div>
+
         <v-spacer />
         <div class="file-card-group">
             <v-chip>
@@ -19,12 +23,15 @@
                 </template>
                 <span>Ссылка скопирована</span>
             </v-tooltip>
+            <v-btn @click="deleteFile()" text icon>
+                <v-icon medium color="red">mdi-trash-can-outline</v-icon>
+            </v-btn>
         </div>
     </v-card>
 </template>
 
 <script lang="ts" >
-import { _File } from "@/services/FileService";
+import FileService, { _File } from "@/services/FileService";
 import Vue, { PropType } from "vue"
 
 
@@ -33,7 +40,6 @@ export default Vue.extend({
     name: "FileComponent",
     data: () => ({
         showTooltip: false,
-
     }),
     props: {
         data: {
@@ -42,15 +48,36 @@ export default Vue.extend({
         }
     },
     methods: {
-        download() {
+        async deleteFile() {
+            await FileService.DeleteFile(this.data.id)
+            this.$destroy()
+            if (this.$el.parentNode)
+                this.$el.parentNode.removeChild(this.$el);
+        },
+        async publishFile(){
+            await FileService.PublishFile(this.data.id)
+            let resp = await FileService.GetFileById(this.data.id)
+            this.data.public_url = resp.data.public_url
+        },
+        updateFile(e: string) {
+            FileService.RenameFile(this.data.id, e)
+        },
+        async download() {
+            if (!this.data.public_url) {
+                this.publishFile()
+            }
             const link = document.createElement("a");
             link.download = this.data.name;
             link.href = this.data.public_url;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            return
         },
-        copyToClipboard() {
+        async copyToClipboard() {
+            if (!this.data.public_url) {
+                this.publishFile()
+            }
             this.showTooltip = true
             navigator.clipboard.writeText(this.data.public_url)
             setTimeout(() => {

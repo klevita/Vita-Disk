@@ -5,13 +5,13 @@
                 v-model="file" show-size label="Загрузить файл"></v-file-input>
             <v-btn @click="addFolder()">Добавить папку</v-btn>
         </v-card>
-        <FolderComponent v-for="folder in foldersData" :folderData="folder" />
+        <FolderComponent v-for="folder in rawFoldersData" :folderData="folder" />
         <FileComponent v-for="f in files" :data="f" :key="f.id" />
     </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue, { inject } from 'vue'
 import FileService, { _File } from "../services/FileService"
 import FolderService, { _Folder } from "../services/FolderService"
 import FileComponent from '@/components/FileComponent.vue'
@@ -25,14 +25,25 @@ export default Vue.extend({
         fileErrors: [] as string[],
         file: undefined as File | undefined | null,
         rawFilesData: [] as _File[],
-        foldersData: [] as _Folder[]
+        rawFoldersData: [] as _Folder[]
     }),
     mounted() {
         this.fetchData()
+        
     },
     computed: {
         files(): _File[] {
             return this.rawFilesData.filter((f) => {
+                if(this.$store.state.fileExtensionSearch.length){
+                    if(f.full_name.slice(f.full_name.lastIndexOf('.')+1) !== this.$store.state.fileExtensionSearch){
+                        return false
+                    }
+                }
+                if(this.$store.state.fileNameSearch.length){
+                    if(!f.name.includes(this.$store.state.fileNameSearch)){
+                        return false
+                    }
+                }
                 return !f?.folder_id
             })
         }
@@ -40,7 +51,15 @@ export default Vue.extend({
     methods: {
         async fetchData() {
             this.rawFilesData = (await FileService.GetFiles()).data
-            this.foldersData = (await FolderService.GetFolders()).data
+            this.rawFoldersData = (await FolderService.GetFolders()).data
+            this.computeWeight()
+        },
+        computeWeight() {
+            let sum = 0
+            this.rawFilesData.forEach(v => {
+                sum += v.size
+            })
+            this.$store.commit('setWeight',sum)
         },
         async addFolder() {
             await FolderService.AddFolder((Math.random() + 1).toString(36))
@@ -65,8 +84,7 @@ export default Vue.extend({
         async processFile(f: File | undefined | null) {
             if (this.validateFile(f) && f) {
                 this.fileLoading = true
-                const resp = await FileService.UploadFile(f)
-                console.log(resp)
+                await FileService.UploadFile(f)
                 this.fileLoading = false
                 this.fetchData()
             }
