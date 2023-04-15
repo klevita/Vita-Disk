@@ -1,6 +1,6 @@
 const { defineConfig } = require("@vue/cli-service");
 module.exports = defineConfig({
-  publicPath: '/Vita-Disk/',
+  publicPath: '/',
   transpileDependencies: [
     'vuetify'
   ],
