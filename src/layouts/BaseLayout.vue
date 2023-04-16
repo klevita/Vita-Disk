@@ -3,11 +3,11 @@
         <v-app-bar :elevation="2">
             <v-toolbar-title>Vita Disk</v-toolbar-title>
             <v-spacer />
-            <v-chip>
+            <v-chip v-if="$route.name === 'home'">
                 {{ ($store.state.weight / 1000000).toFixed(3) + ' мб' }}
             </v-chip>
             <v-spacer />
-            <div class="d-flex pt-6">
+            <div class="d-flex pt-6" v-if="$route.name === 'home'">
                 <v-text-field label="фильтр: имя" clearable v-model="fileName"></v-text-field>
                 <v-text-field label="фильтр: расширение" clearable class="ml-2" v-model="fileExtension"></v-text-field>
             </div>
