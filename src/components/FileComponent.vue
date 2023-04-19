@@ -35,7 +35,6 @@ import FileService, { _File } from "@/services/FileService";
 import Vue, { PropType } from "vue"
 
 
-
 export default Vue.extend({
     name: "FileComponent",
     data: () => ({
@@ -49,6 +48,7 @@ export default Vue.extend({
     },
     methods: {
         async deleteFile() {
+            this.$store.commit('setWeight',this.$store.state.weight - this.data.size)
             await FileService.DeleteFile(this.data.id)
             this.$destroy()
             if (this.$el.parentNode)

@@ -63,6 +63,7 @@ export default Vue.extend({
             if (this.validateFile(f) && f) {
                 this.fileLoading = true;
                 const resp = await FileService.UploadFile(f,this.folderData.id);
+                this.$store.commit('setWeight',this.$store.state.weight + resp.data.size)
                 this.fileLoading = false;
                 this.rawFilesData = (await FileService.GetFiles(this.folderData.id)).data;
             }
