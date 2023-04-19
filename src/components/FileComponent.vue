@@ -64,7 +64,7 @@ export default Vue.extend({
         },
         async download() {
             if (!this.data.public_url) {
-                this.publishFile()
+                await this.publishFile()
             }
             const link = document.createElement("a");
             link.download = this.data.name;
@@ -76,7 +76,7 @@ export default Vue.extend({
         },
         async copyToClipboard() {
             if (!this.data.public_url) {
-                this.publishFile()
+                await this.publishFile()
             }
             this.showTooltip = true
             navigator.clipboard.writeText(this.data.public_url)

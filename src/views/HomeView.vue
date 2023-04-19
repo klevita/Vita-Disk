@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { inject } from 'vue'
+import Vue, { nextTick } from 'vue'
 import FileService, { _File } from "../services/FileService"
 import FolderService, { _Folder } from "../services/FolderService"
 import FileComponent from '@/components/FileComponent.vue'
@@ -28,19 +28,20 @@ export default Vue.extend({
         rawFoldersData: [] as _Folder[]
     }),
     mounted() {
+        setTimeout(()=>[
         this.fetchData()
-        
+        ],1000)
     },
     computed: {
         files(): _File[] {
             return this.rawFilesData.filter((f) => {
-                if(this.$store.state.fileExtensionSearch.length){
-                    if(f.full_name.slice(f.full_name.lastIndexOf('.')+1) !== this.$store.state.fileExtensionSearch){
+                if (this.$store.state.fileExtensionSearch.length) {
+                    if (f.full_name.slice(f.full_name.lastIndexOf('.') + 1) !== this.$store.state.fileExtensionSearch) {
                         return false
                     }
                 }
-                if(this.$store.state.fileNameSearch.length){
-                    if(!f.name.includes(this.$store.state.fileNameSearch)){
+                if (this.$store.state.fileNameSearch.length) {
+                    if (!f.name.includes(this.$store.state.fileNameSearch)) {
                         return false
                     }
                 }
@@ -59,7 +60,7 @@ export default Vue.extend({
             this.rawFilesData.forEach(v => {
                 sum += v.size
             })
-            this.$store.commit('setWeight',sum)
+            this.$store.commit('setWeight', sum)
         },
         async addFolder() {
             await FolderService.AddFolder((Math.random() + 1).toString(36))
